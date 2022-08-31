@@ -1,0 +1,218 @@
+package by.htp.ex.dao.impl;
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.List;
+import by.htp.ex.bean.News;
+import by.htp.ex.dao.INewsDAO;
+import by.htp.ex.dao.NewsDAOException;
+import by.htp.ex.dao.connectionpool.ConnectionPool;
+import by.htp.ex.dao.connectionpool.ConnectionPoolException;
+import by.htp.ex.util.LocalAndDateParameter;
+import by.htp.ex.util.NewsParameter;
+
+public class NewsDAO implements INewsDAO {
+	
+	private final static ConnectionPool provider = ConnectionPool.getInstance();
+	private Connection connection = null;
+	private PreparedStatement ps = null;
+	private ResultSet rs = null;		
+	
+	private static final String TAK_LAST_COUNT_NEWS = "SELECT id, newsDate, title ,brief, content FROM news ORDER BY newsDate DESC LIMIT ?";
+
+	@Override
+	public List<News> getLatestsList(int count) throws NewsDAOException {	
+		
+		List<News> result = new ArrayList<News>();
+		 
+		try {
+			connection = provider.takeConnection();
+			ps = connection.prepareStatement(TAK_LAST_COUNT_NEWS);
+
+			ps.setInt(1, count);
+			rs = ps.executeQuery();
+			while (rs.next()) {
+				String dateToString = convertDateToString(rs);
+				News lastListNews = new News(rs.getInt(1), dateToString, rs.getString(3), rs.getString(4),
+						rs.getString(5));
+				result.add(lastListNews);
+			}
+
+			return result;
+
+		} catch (SQLException e) {
+			throw new NewsDAOException(e);
+		} catch (ConnectionPoolException e) {
+			throw new NewsDAOException(e);
+		} finally {
+			provider.closeConnection(connection, ps, rs);
+		}
+	}
+
+	private static final String TAKE_ALL_NEWS = "SELECT id, newsDate, title ,brief, content FROM news ORDER BY newsDate DESC";
+
+	@Override
+	public List<News> getList() throws NewsDAOException {	
+		
+		List<News> result = new ArrayList<News>();
+
+		try {
+			connection = provider.takeConnection();
+			ps = connection.prepareStatement(TAKE_ALL_NEWS);
+
+			rs = ps.executeQuery();
+			while (rs.next()) {
+				String dateToString = convertDateToString(rs);
+				News news = new News(rs.getInt(NewsParameter.ID_NEWS), dateToString,
+						rs.getString(NewsParameter.TITLE_NEWS), rs.getString(NewsParameter.BRIEF_NEWS),
+						rs.getString(NewsParameter.CONTENT_NEWS));
+				result.add(news);
+			}
+
+			return result;
+
+		} catch (SQLException e) {
+			throw new NewsDAOException(e);
+		} catch (ConnectionPoolException e) {
+			throw new NewsDAOException(e);
+		} finally {
+			provider.closeConnection(connection, ps, rs);
+		}
+	}
+
+	private static final String SELECT_NEWS_BY_ID = "SELECT id, newsDate, title ,brief, content FROM news WHERE id = ?";
+
+	@Override
+	public News fetchById(int id) throws NewsDAOException, ConnectionPoolException {
+
+		try {
+			connection = provider.takeConnection();
+			ps = connection.prepareStatement(SELECT_NEWS_BY_ID);
+
+			ps.setInt(1, id);
+			rs = ps.executeQuery();
+			
+			if (!rs.next()) {
+				return null;
+			}
+			String dateToString = convertDateToString(rs);
+
+			News news = new News(id, dateToString, rs.getString(NewsParameter.TITLE_NEWS),
+					rs.getString(NewsParameter.BRIEF_NEWS), rs.getString(NewsParameter.CONTENT_NEWS));
+
+			return news;
+			
+		} catch (ConnectionPoolException | SQLException e) {
+			throw new NewsDAOException(e);
+		} finally {
+			provider.closeConnection(connection, ps, rs);
+		}
+	}
+
+	private static final String INSERT_NEW_NEWS = "INSERT INTO news (newsDate,title,brief,content,reporter_id) values (?,?,?,?,?)";
+
+	@Override
+	public int addNews(News news) throws NewsDAOException {
+		try {
+			connection = provider.takeConnection();
+			ps = connection.prepareStatement(INSERT_NEW_NEWS);
+
+			ps.setString(1, getDate());
+			ps.setString(2, news.getTitle());
+			ps.setString(3, news.getBrief());
+			ps.setString(4, news.getContent());
+			ps.setInt(5, news.getUserId());
+			ps.executeUpdate();			
+			
+			return 1;
+		} catch (SQLException e) {
+			throw new NewsDAOException(e);
+		} catch (ConnectionPoolException e) {
+			throw new NewsDAOException(e);
+		} finally {
+			provider.closeConnection(connection, ps);
+		}
+	}
+
+	private static final String UPDATE_NEWS = "UPDATE news SET newsDate = ?, title = ?, brief = ?, content = ? WHERE id = ?";
+
+	@Override
+	public boolean updateNews(News news) throws NewsDAOException {
+		try {	
+			connection = provider.takeConnection();
+			ps = connection.prepareStatement(UPDATE_NEWS);
+			
+			ps.setString(1, getDate());
+			ps.setString(2, news.getTitle());
+			ps.setString(3, news.getBrief());
+			ps.setString(4, news.getContent());
+			ps.setInt(5, news.getIdNews());
+			int rs = ps.executeUpdate();			
+			
+			if (rs == 0) {
+				return false;
+			}
+			return true;
+
+		} catch (SQLException e) {
+			throw new NewsDAOException(e);
+
+		} catch (ConnectionPoolException e) {
+			throw new NewsDAOException(e);
+		} finally {
+			provider.closeConnection(connection, ps);
+		}
+	}
+	
+	private static final String DELETE_NEWS = "DELETE FROM news WHERE id = ?";
+
+	@Override
+	public boolean deleteNews(String[] idNews) throws NewsDAOException {
+		try {
+			connection = provider.takeConnection();
+			ps = connection.prepareStatement(DELETE_NEWS);
+			
+			connection.setAutoCommit(false);
+			connection.rollback();
+			for (int i = 0; i < idNews.length; i++) {
+				ps.setInt(1, Integer.parseInt(idNews[i]));				
+				ps.executeUpdate();
+			}		
+			connection.commit();
+			connection.setAutoCommit(true);
+			
+			return true;
+
+		} catch (SQLException e) {
+			throw new NewsDAOException(e);
+		} catch (ConnectionPoolException e) {
+			throw new NewsDAOException(e);
+		} finally {
+			provider.closeConnection(connection, ps);
+		}
+	}
+
+	private String getDate() {
+		ZonedDateTime zonedDateTime = ZonedDateTime.ofInstant(Instant.now(), ZoneId.of(LocalAndDateParameter.ZONE_ID));
+		DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(LocalAndDateParameter.DATE_FORMAT_FOR_GET_DATE);
+		String date = dateTimeFormatter.format(zonedDateTime);
+		return date;
+	}
+
+	private String convertDateToString(ResultSet rs) throws SQLException {
+		SimpleDateFormat simpleDateFormat = new SimpleDateFormat(LocalAndDateParameter.DATE_FORMAT_FOR_USER,
+				LocalAndDateParameter.LOCALE_FOR_USER);
+		Timestamp timestamp = rs.getTimestamp(NewsParameter.DATA_NEWS);
+		String dateToString = simpleDateFormat.format(timestamp);
+		return dateToString;
+	}
+}
