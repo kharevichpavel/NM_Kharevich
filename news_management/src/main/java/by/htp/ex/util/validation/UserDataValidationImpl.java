@@ -21,13 +21,13 @@ public class UserDataValidationImpl implements UserDataValidation {
 		String login = user.getLogin();
 		String password = user.getPassword();
 		String email = user.getEmail();
-		String tel = user.getTel();
-		if (login.isEmpty() || password.isEmpty() || email.isEmpty() || tel.isEmpty()) {
+		String telephone = user.getTelephone();
+		if (login.isEmpty() || password.isEmpty() || email.isEmpty() || telephone.isEmpty()) {
 			return false;
 		}
 		if (Pattern.matches(PatternParameter.PATTERN_LOGIN, login) 
 				&& Pattern.matches(PatternParameter.PATTERN_EMAIL, email)
-				&& Pattern.matches(PatternParameter.PATTERN_TEL, tel)) {
+				&& Pattern.matches(PatternParameter.PATTERN_TEL, telephone)) {
 			return true;
 		}
 		return false;

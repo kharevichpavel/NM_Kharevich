@@ -6,6 +6,7 @@ import by.htp.ex.dao.DaoProvider;
 import by.htp.ex.dao.IUserDAO;
 import by.htp.ex.service.ServiceException;
 import by.htp.ex.util.AttributeForAll;
+import by.htp.ex.util.UserParameter;
 import by.htp.ex.util.validation.UserDataValidation;
 import by.htp.ex.util.validation.ValidationProvider;
 import by.htp.ex.service.IUserService;
@@ -46,12 +47,12 @@ public class UserServiceImpl implements IUserService {
 	@Override
 	public int takeUserId(String login) throws ServiceException {
 		try {
-			if (userDAO.takeUserId(login)!=0) {
+			if (userDAO.takeUserId(login)!=UserParameter.USER_NOT_DEFINED) {
 				return userDAO.takeUserId(login);
 			}
 		} catch (DaoException e) {
 			throw new ServiceException(e);
 		}
-		return 0;
+		return UserParameter.USER_NOT_DEFINED;
 	}	
 }

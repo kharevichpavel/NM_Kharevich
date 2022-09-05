@@ -12,6 +12,10 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import by.htp.ex.bean.News;
 import by.htp.ex.dao.INewsDAO;
 import by.htp.ex.dao.NewsDAOException;
@@ -22,15 +26,16 @@ import by.htp.ex.util.NewsParameter;
 
 public class NewsDAO implements INewsDAO {
 	
-	private final static ConnectionPool provider = ConnectionPool.getInstance();
-	private Connection connection = null;
-	private PreparedStatement ps = null;
-	private ResultSet rs = null;		
+	private final static ConnectionPool provider = ConnectionPool.getInstance();		
 	
 	private static final String TAK_LAST_COUNT_NEWS = "SELECT id, newsDate, title ,brief, content FROM news ORDER BY newsDate DESC LIMIT ?";
 
 	@Override
 	public List<News> getLatestsList(int count) throws NewsDAOException {	
+		
+		Connection connection = null;
+		PreparedStatement ps = null;
+		ResultSet rs = null;
 		
 		List<News> result = new ArrayList<News>();
 		 
@@ -63,6 +68,10 @@ public class NewsDAO implements INewsDAO {
 	@Override
 	public List<News> getList() throws NewsDAOException {	
 		
+		Connection connection = null;
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+		
 		List<News> result = new ArrayList<News>();
 
 		try {
@@ -92,7 +101,11 @@ public class NewsDAO implements INewsDAO {
 	private static final String SELECT_NEWS_BY_ID = "SELECT id, newsDate, title ,brief, content FROM news WHERE id = ?";
 
 	@Override
-	public News fetchById(int id) throws NewsDAOException, ConnectionPoolException {
+	public News fetchById(int id) throws NewsDAOException{
+		
+		Connection connection = null;
+		PreparedStatement ps = null;
+		ResultSet rs = null;
 
 		try {
 			connection = provider.takeConnection();
@@ -102,7 +115,7 @@ public class NewsDAO implements INewsDAO {
 			rs = ps.executeQuery();
 			
 			if (!rs.next()) {
-				return null;
+				throw new NewsDAOException("News is not found!");
 			}
 			String dateToString = convertDateToString(rs);
 
@@ -122,6 +135,10 @@ public class NewsDAO implements INewsDAO {
 
 	@Override
 	public int addNews(News news) throws NewsDAOException {
+		
+		Connection connection = null;
+		PreparedStatement ps = null;		
+		
 		try {
 			connection = provider.takeConnection();
 			ps = connection.prepareStatement(INSERT_NEW_NEWS);
@@ -147,6 +164,10 @@ public class NewsDAO implements INewsDAO {
 
 	@Override
 	public boolean updateNews(News news) throws NewsDAOException {
+		
+		Connection connection = null;
+		PreparedStatement ps = null;
+				
 		try {	
 			connection = provider.takeConnection();
 			ps = connection.prepareStatement(UPDATE_NEWS);
@@ -156,12 +177,9 @@ public class NewsDAO implements INewsDAO {
 			ps.setString(3, news.getBrief());
 			ps.setString(4, news.getContent());
 			ps.setInt(5, news.getIdNews());
-			int rs = ps.executeUpdate();			
+			int result = ps.executeUpdate();		
 			
-			if (rs == 0) {
-				return false;
-			}
-			return true;
+			return !(result == 0);
 
 		} catch (SQLException e) {
 			throw new NewsDAOException(e);
@@ -177,6 +195,10 @@ public class NewsDAO implements INewsDAO {
 
 	@Override
 	public boolean deleteNews(String[] idNews) throws NewsDAOException {
+		
+		Connection connection = null;
+		PreparedStatement ps = null;		
+		
 		try {
 			connection = provider.takeConnection();
 			ps = connection.prepareStatement(DELETE_NEWS);

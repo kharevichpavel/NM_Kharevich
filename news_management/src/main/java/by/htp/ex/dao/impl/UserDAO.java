@@ -22,16 +22,16 @@ import by.htp.ex.util.LocalAndDateParameter;
 
 public class UserDAO implements IUserDAO {
 	
-	private final static ConnectionPool provider = ConnectionPool.getInstance();
-	private Connection connection = null;
-	private PreparedStatement ps = null;
-	private Statement st = null;
-	private ResultSet rs = null;
+	private final static ConnectionPool provider = ConnectionPool.getInstance();	
 	
 	@Override
 	public boolean logination(String login, String password) throws DaoException {
 		
 		final String selectUserId = "SELECT password FROM users WHERE login = " + "\"" + login + "\"";
+		
+		Connection connection = null;
+		PreparedStatement ps = null;		
+		ResultSet rs = null;
 		
 		try {
 			connection = provider.takeConnection();
@@ -40,7 +40,7 @@ public class UserDAO implements IUserDAO {
 			rs.next();
 			
 			String passwordFromDb = rs.getString(1);		
-			//String hashSalt = getBcryptSalt(passwordFromDb);			
+					
 			String passwordUserHash = BCrypt.hashpw(password, getBcryptSalt(passwordFromDb));
 
 			if (passwordFromDb.equals(passwordUserHash)) {
@@ -56,10 +56,15 @@ public class UserDAO implements IUserDAO {
 	}		
 	
 	private final String selectForLogination = "SELECT * FROM users";
-	private final String insertNewUserInUsers = "INSERT INTO users (login,password,registration_date,email,tel,roles_id) values (?,?,?,?,?,?)";
+	private final String insertNewUserInUsers = "INSERT INTO users (login,password,registration_date,email,telephone,roles_id) values (?,?,?,?,?,?)";
 
 	@Override
 	public boolean registration(NewUserInfo user) throws DaoException {
+		
+		Connection connection = null;
+		PreparedStatement ps = null;
+		Statement st = null;
+		ResultSet rs = null;
 
 		try {
 			connection = provider.takeConnection();
@@ -69,8 +74,8 @@ public class UserDAO implements IUserDAO {
 			while (rs.next()) {
 				String loginUser = rs.getString(2);
 				String email = rs.getString(5);
-				String tel = rs.getString(6);
-				if (loginUser.equals(user.getLogin()) || email.equals(user.getEmail()) || tel.equals(user.getTel())) {
+				String telephone = rs.getString(6);
+				if (loginUser.equals(user.getLogin()) || email.equals(user.getEmail()) || telephone.equals(user.getTelephone())) {
 					return false;
 				}
 			}
@@ -78,7 +83,7 @@ public class UserDAO implements IUserDAO {
 			ps.setString(2, user.getPassword());
 			ps.setString(3, getDate());
 			ps.setString(4, user.getEmail());
-			ps.setString(5, user.getTel());
+			ps.setString(5, user.getTelephone());
 			ps.setInt(6, 2);
 			ps.executeUpdate();
 			return true;
@@ -94,6 +99,11 @@ public class UserDAO implements IUserDAO {
 	private final String selectUserRole = "SELECT roles.title FROM users INNER JOIN roles ON users.roles_id=roles.id WHERE users.login=?";
 
 	public String getRole(String login) throws DaoException {
+		
+		Connection connection = null;
+		PreparedStatement ps = null;		
+		ResultSet rs = null;
+		
 		try {
 			connection = provider.takeConnection();
 			ps = connection.prepareStatement(selectUserRole);
@@ -113,6 +123,11 @@ public class UserDAO implements IUserDAO {
 	}
 
 	public String getRole(NewUserInfo user) throws DaoException {
+		
+		Connection connection = null;
+		PreparedStatement ps = null;		
+		ResultSet rs = null;
+		
 		try {
 			connection = provider.takeConnection();
 			ps = connection.prepareStatement(selectUserRole);
@@ -135,6 +150,10 @@ public class UserDAO implements IUserDAO {
 	public int takeUserId(String login) throws DaoException {
 		
 		final String selectUserId = "SELECT id FROM users WHERE login = " + "\"" + login + "\"";
+		
+		Connection connection = null;
+		PreparedStatement ps = null;		
+		ResultSet rs = null;
 		
 		try {
 			connection = provider.takeConnection();
@@ -170,8 +189,7 @@ public class UserDAO implements IUserDAO {
                 break;
             }
         }
-        String hashSalt = stringBuilder.toString();
-                
+        String hashSalt = stringBuilder.toString();                
 		return hashSalt;		
 	}	
 }

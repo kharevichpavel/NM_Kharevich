@@ -25,36 +25,42 @@
 		</div>
 
 		<div class="base-layout-wrapper">
-		
+
 			<div class="menu">
-			
+
 				<c:if test="${not (sessionScope.user eq 'active')}">
 					<c:if test="${requestScope.presentation eq 'registration' }">
-						<c:import url="/WEB-INF/pages/tiles/registration.jsp" />						
+						<c:import url="/WEB-INF/pages/tiles/registration.jsp" />
 					</c:if>
 				</c:if>
-				
+
 				<c:if test="${sessionScope.user eq 'active'}">
 					<c:import url="/WEB-INF/pages/tiles/menu.jsp" />
 				</c:if>
-				
+
 			</div>
 
 			<div class="content">
 				<c:if test="${not (sessionScope.user eq 'active')}">
-					<c:import url="/WEB-INF/pages/tiles/guestInfo.jsp" />
+					<c:if test="${not (sessionScope.errorState eq 'active')}">
+						<c:import url="/WEB-INF/pages/tiles/guestInfo.jsp" />
+					</c:if>
+					<c:if test="${sessionScope.errorState eq 'active'}">
+						<c:import url="/WEB-INF/pages/tiles/error.jsp" />
+					</c:if>
 				</c:if>
+
 				<c:if test="${sessionScope.user eq 'active'}">
 					<c:import url="/WEB-INF/pages/tiles/body.jsp" />
 				</c:if>
 			</div>
-			
+
 		</div>
 
 		<div class="footer">
 			<c:import url="/WEB-INF/pages/tiles/footer.jsp" />
 		</div>
-		
+
 	</div>
 </body>
 </html>

@@ -23,7 +23,10 @@ public class AttributeForAll {
 	public static final String PRESENTATION_VIEW_NEWS = "viewNews";
 	public static final String PRESENTATION_ADD_NEWS = "addNews";
 	public static final String PRESENTATION_NEWS_LIST = "newsList";
-	public static final String PRESENTATION_REGISTRATION = "registration";
+	public static final String PRESENTATION_REGISTRATION = "registration";	
+	
+	public static final String LOCAL = "local";
+	public static final String REFERER = "referer";
 	
 	public static final String URL_TO_BASE_LAYOUT = "WEB-INF/pages/layouts/baseLayout.jsp";
 	public static final String URL_TO_INDEX = "index.jsp";

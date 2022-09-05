@@ -13,9 +13,7 @@ public class DoSignOut implements Command {
 	@Override
 	public void execute(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
-			request.getSession(true).setAttribute(AttributeForAll.USER_STATE, AttributeForAll.USER_STATE_NOT_ACTIVE);
-			response.sendRedirect(AttributeForAll.URL_TO_INDEX);
-		
+		request.getSession(true).setAttribute(AttributeForAll.USER_STATE, AttributeForAll.USER_STATE_NOT_ACTIVE);
+		response.sendRedirect(AttributeForAll.URL_TO_INDEX);
 	}
-
 }

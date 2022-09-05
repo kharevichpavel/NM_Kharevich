@@ -15,6 +15,7 @@ import by.htp.ex.service.ServiceException;
 import by.htp.ex.service.ServiceProvider;
 import by.htp.ex.util.AttributeCommand;
 import by.htp.ex.util.AttributeForAll;
+import by.htp.ex.util.ErrorParameter;
 import by.htp.ex.util.NewsParameter;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -30,8 +31,8 @@ public class AddNews implements Command {
 	@Override
 	public void execute(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException, DaoException {
-		
-		HttpSession getSession = request.getSession(true);
+
+		HttpSession getSession = request.getSession();
 
 		int idNews = 0;
 		String newsDate = request.getParameter(NewsParameter.DATA_NEWS);
@@ -45,13 +46,14 @@ public class AddNews implements Command {
 		try {
 			if (service.save(news)) {
 				getSession.setAttribute(AttributeForAll.USER_STATE, AttributeForAll.USER_STATE_ACTIVE);
-				getSession.setAttribute(AttributeForAll.USER_ROLE, AttributeForAll.USER_ROLE_ADMIN);				
+				getSession.setAttribute(AttributeForAll.USER_ROLE, AttributeForAll.USER_ROLE_ADMIN);
 				response.sendRedirect(AttributeCommand.COMMAND_GO_TO_NEWS_LIST);
 			}
-		} catch (ServiceException e) {
+		} catch (ServiceException | ConnectionPoolException e) {
 			log.log(Level.ERROR, e);
-		} catch (ConnectionPoolException e) {
-			log.log(Level.ERROR, e);
+			getSession.setAttribute(AttributeForAll.USER_ROLE, AttributeForAll.USER_STATE_NOT_ACTIVE);
+			getSession.setAttribute(ErrorParameter.ERROR_NUMBER, ErrorParameter.ERROR_NUMBER_5);
+			response.sendRedirect(AttributeCommand.COMMAND_GO_TO_ERROR_PAGE);
 		}
 	}
 }

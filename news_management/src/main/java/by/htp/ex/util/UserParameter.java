@@ -10,5 +10,7 @@ public class UserParameter {
 	
 	public static final String LOGIN_PARAM = "login";
 	public static final String PASSWORD_PARAM = "password";
+	
+	public static final int USER_NOT_DEFINED = 0;
 
 }
