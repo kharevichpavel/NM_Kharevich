@@ -11,7 +11,8 @@ public interface INewsService {
   boolean update(News news) throws ServiceException;
   boolean delete(String[] idNews) throws ServiceException;
   List<News> latestList(int count)  throws ServiceException;
-  List<News> list()  throws ServiceException;
+  List<News> list(int paginationId, int paginationSizeFromUser)  throws ServiceException;
   News findById(int id) throws ServiceException, ConnectionPoolException;
+  int getDbSize() throws ServiceException;
  
 }

@@ -34,7 +34,7 @@ public class DoSignIn implements Command {
 
 		if (login.isEmpty() | password.isEmpty()) {
 			request.getSession(true).setAttribute(AttributeForAll.USER_STATE, AttributeForAll.USER_STATE_NOT_ACTIVE);
-			request.getSession(true).setAttribute(AttributeForAll.AUTHENTICATION_ERROR, "wrong login or password");
+			request.getSession(true).setAttribute(AttributeForAll.AUTHENTICATION_ERROR, AttributeForAll.AUTHENTICATION_ERROR_WRONG_LOGIN_PASSWORD);
 			response.sendRedirect(AttributeCommand.COMMAND_GO_TO_BASE_PAGE);
 			return;
 		}
@@ -50,9 +50,10 @@ public class DoSignIn implements Command {
 				response.sendRedirect(AttributeCommand.COMMAND_GO_TO_NEWS_LIST);
 
 			} else {
+				log.log(Level.ERROR, "Wrong login or password");
 				request.getSession(true).setAttribute(AttributeForAll.USER_STATE,
 						AttributeForAll.USER_STATE_NOT_ACTIVE);
-				request.getSession(true).setAttribute(AttributeForAll.AUTHENTICATION_ERROR, "wrong login or password");
+				request.getSession(true).setAttribute(AttributeForAll.AUTHENTICATION_ERROR, AttributeForAll.AUTHENTICATION_ERROR_WRONG_LOGIN_PASSWORD);
 				response.sendRedirect(AttributeCommand.COMMAND_GO_TO_BASE_PAGE);
 			}
 

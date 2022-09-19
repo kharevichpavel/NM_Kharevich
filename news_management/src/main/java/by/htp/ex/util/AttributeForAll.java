@@ -17,6 +17,7 @@ public class AttributeForAll {
 	public static final String NEWS = "news";
 	
 	public static final String AUTHENTICATION_ERROR = "AuthenticationError";
+	public static final String AUTHENTICATION_ERROR_WRONG_LOGIN_PASSWORD = "wrong login or password";
 	
 	public static final String PRESENTATION = "presentation";
 	public static final String PRESENTATION_EDIT_NEWS = "editNews";
@@ -31,5 +32,5 @@ public class AttributeForAll {
 	public static final String URL_TO_BASE_LAYOUT = "WEB-INF/pages/layouts/baseLayout.jsp";
 	public static final String URL_TO_INDEX = "index.jsp";
 	public static final String URL_TO_NEWS_LIST = "WEB-INF/pages/tiles/newsList.jsp";
-
+		
 }

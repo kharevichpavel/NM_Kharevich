@@ -12,7 +12,7 @@ public class News implements Serializable {
 	private String title = "";
 	private String brief = "";
 	private String content = "";
-	private int userId = 0;
+	private int userId = 0;	
 
 	public News() {
 	}

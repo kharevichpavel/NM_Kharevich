@@ -60,31 +60,65 @@ public class NewsDAO implements INewsDAO {
 		}
 	}
 
-	private static final String TAKE_ALL_NEWS = "SELECT id, newsDate, title ,brief, content FROM news ORDER BY newsDate DESC";
+	private static final String TAKE_ALL_NEWS = "SELECT id, newsDate, title ,brief, content FROM news";
 
 	@Override
-	public List<News> getList() throws NewsDAOException {	
+	public List<News> getList(int paginationId, int paginationSizeFromUser) throws NewsDAOException {	
 		
 		Connection connection = null;
 		PreparedStatement ps = null;
 		ResultSet rs = null;
 		
 		List<News> result = new ArrayList<News>();
-
+		
 		try {
 			connection = provider.takeConnection();
 			ps = connection.prepareStatement(TAKE_ALL_NEWS);
-
-			rs = ps.executeQuery();
+			rs = ps.executeQuery();			
+			int numberOfTableRows = 0;
 			while (rs.next()) {
 				String dateToString = convertDateToString(rs);
 				News news = new News(rs.getInt(NewsParameter.ID_NEWS), dateToString,
 						rs.getString(NewsParameter.TITLE_NEWS), rs.getString(NewsParameter.BRIEF_NEWS),
 						rs.getString(NewsParameter.CONTENT_NEWS));
 				result.add(news);
+				numberOfTableRows += 1;
 			}
+			if(paginationId>(int) Math.ceil((double)numberOfTableRows/paginationSizeFromUser)) {				
+				paginationId = 1;
+			}			
+			int firstIndexForPagination = paginationId*paginationSizeFromUser-paginationSizeFromUser;
+			int lastIndexForPagination = paginationId*paginationSizeFromUser;
+			if(lastIndexForPagination>numberOfTableRows) {
+				lastIndexForPagination = numberOfTableRows;
+			}
+			return result.subList(firstIndexForPagination, lastIndexForPagination);
 
-			return result;
+		} catch (SQLException e) {
+			throw new NewsDAOException(e);
+		} catch (ConnectionPoolException e) {
+			throw new NewsDAOException(e);
+		} finally {
+			provider.closeConnection(connection, ps, rs);
+		}
+	}
+	
+	@Override
+	public int getDbSize() throws NewsDAOException {
+		Connection connection = null;
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+
+		try {
+			connection = provider.takeConnection();
+			ps = connection.prepareStatement(TAKE_ALL_NEWS);
+			rs = ps.executeQuery();			
+			int numberOfTableRows = 0;
+			while (rs.next()) {				
+				numberOfTableRows += 1;
+			}
+		
+			return numberOfTableRows;
 
 		} catch (SQLException e) {
 			throw new NewsDAOException(e);
@@ -233,5 +267,5 @@ public class NewsDAO implements INewsDAO {
 		Timestamp timestamp = rs.getTimestamp(NewsParameter.DATA_NEWS);
 		String dateToString = simpleDateFormat.format(timestamp);
 		return dateToString;
-	}
+	}	
 }

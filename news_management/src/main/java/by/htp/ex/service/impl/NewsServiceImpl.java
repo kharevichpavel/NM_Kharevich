@@ -50,9 +50,9 @@ public class NewsServiceImpl implements INewsService{
 	}
 
 	@Override
-	public List<News> list() throws ServiceException {
+	public List<News> list(int paginationId, int paginationSizeFromUser) throws ServiceException {
 		try {
-			return newsDAO.getList();
+			return newsDAO.getList(paginationId, paginationSizeFromUser);
 		} catch (NewsDAOException e) {
 			throw new ServiceException(e);
 		}
@@ -77,5 +77,14 @@ public class NewsServiceImpl implements INewsService{
 			throw new ServiceException(e);
 		}
 		return true;		
+	}
+
+	@Override
+	public int getDbSize() throws ServiceException {
+		try {			
+			return newsDAO.getDbSize();
+		} catch (NewsDAOException e) {
+			throw new ServiceException(e);
+		}
 	}		
 }

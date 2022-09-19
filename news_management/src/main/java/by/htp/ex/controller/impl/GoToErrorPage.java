@@ -16,14 +16,11 @@ public class GoToErrorPage implements Command {
 	@Override
 	public void execute(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException, DaoException {
-		
+
 		HttpSession getSession = request.getSession();
-		
-		
-		getSession.setAttribute(ErrorParameter.ERROR_STATE, ErrorParameter.ERROR_STATE_ACTIVE);						
+
+		getSession.setAttribute(ErrorParameter.ERROR_STATE, ErrorParameter.ERROR_STATE_ACTIVE);
 		request.getRequestDispatcher(AttributeForAll.URL_TO_BASE_LAYOUT).forward(request, response);
 		getSession.removeAttribute(ErrorParameter.ERROR_STATE);
-
 	}
-
 }

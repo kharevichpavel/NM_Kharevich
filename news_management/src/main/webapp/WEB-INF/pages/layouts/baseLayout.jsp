@@ -51,7 +51,12 @@
 				</c:if>
 
 				<c:if test="${sessionScope.user eq 'active'}">
-					<c:import url="/WEB-INF/pages/tiles/body.jsp" />
+					<c:if test="${not (sessionScope.errorState eq 'active')}">
+						<c:import url="/WEB-INF/pages/tiles/body.jsp" />
+					</c:if>
+					<c:if test="${sessionScope.errorState eq 'active'}">
+						<c:import url="/WEB-INF/pages/tiles/error.jsp" />
+					</c:if>
 				</c:if>
 			</div>
 

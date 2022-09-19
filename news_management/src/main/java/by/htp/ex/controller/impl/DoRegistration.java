@@ -50,6 +50,7 @@ public class DoRegistration implements Command {
 				getSession.setAttribute(AttributeForAll.USER_ROLE, role);
 				response.sendRedirect(AttributeCommand.COMMAND_GO_TO_NEWS_LIST);
 			} else {
+				log.log(Level.ERROR, "User exists, change login!");
 				getSession.setAttribute(AttributeForAll.USER_ROLE, AttributeForAll.USER_STATE_NOT_ACTIVE);							
 				getSession.setAttribute(ErrorParameter.ERROR_NUMBER, ErrorParameter.ERROR_NUMBER_3);								
 				response.sendRedirect(AttributeCommand.COMMAND_GO_TO_ERROR_PAGE);								

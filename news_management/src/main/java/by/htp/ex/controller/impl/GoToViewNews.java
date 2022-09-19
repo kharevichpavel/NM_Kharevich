@@ -1,6 +1,7 @@
 package by.htp.ex.controller.impl;
 
 import java.io.IOException;
+import java.util.Scanner;
 
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
@@ -33,19 +34,25 @@ public class GoToViewNews implements Command {
 		HttpSession getSession = request.getSession();
 
 		News news;
-		int idNews;
-		idNews = Integer.parseInt(request.getParameter(NewsParameter.ID_NEWS));
+		int idNews = 0;
 
 		try {
+			Scanner scanner = new Scanner(request.getParameter(NewsParameter.ID_NEWS));
+			if (scanner.hasNextInt()) {
+				idNews = Integer.parseInt(request.getParameter(NewsParameter.ID_NEWS));
 
-			news = newsService.findById(idNews);
-			request.setAttribute(AttributeForAll.NEWS, news);
-			request.setAttribute(AttributeForAll.PRESENTATION, AttributeForAll.PRESENTATION_VIEW_NEWS);
-			request.getRequestDispatcher(AttributeForAll.URL_TO_BASE_LAYOUT).forward(request, response);
-
+				news = newsService.findById(idNews);
+				request.setAttribute(AttributeForAll.NEWS, news);
+				request.setAttribute(AttributeForAll.PRESENTATION, AttributeForAll.PRESENTATION_VIEW_NEWS);
+				request.getRequestDispatcher(AttributeForAll.URL_TO_BASE_LAYOUT).forward(request, response);
+			} else {
+				log.log(Level.ERROR, "Invalid news id");				
+				getSession.setAttribute(ErrorParameter.ERROR_NUMBER, ErrorParameter.ERROR_NUMBER_4);
+				response.sendRedirect(AttributeCommand.COMMAND_GO_TO_ERROR_PAGE);
+			}
+			
 		} catch (ServiceException | ConnectionPoolException e) {
-			log.log(Level.ERROR, e);
-			getSession.setAttribute(AttributeForAll.USER_ROLE, AttributeForAll.USER_STATE_NOT_ACTIVE);
+			log.log(Level.ERROR, e);				
 			getSession.setAttribute(ErrorParameter.ERROR_NUMBER, ErrorParameter.ERROR_NUMBER_4);
 			response.sendRedirect(AttributeCommand.COMMAND_GO_TO_ERROR_PAGE);
 		}

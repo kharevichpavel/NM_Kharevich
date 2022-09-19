@@ -12,6 +12,7 @@
 <fmt:message bundle="${loc}" key="local.locbutton.name.registration" var="registration_button" />
 <fmt:message bundle="${loc}" key="local.locbutton.name.sign.in" var="sign_in_button" />
 <fmt:message bundle="${loc}" key="local.locbutton.name.sign.out" var="sign_out_button" />
+<fmt:message bundle="${loc}" key="local.authentication.error" var="authentication_error" />
 
 <div class="wrapper">
 	<div class="newstitle"><c:out value="${header_newstitle}"/></div>
@@ -38,7 +39,11 @@
 
 					<c:if test="${not (sessionScope.AuthenticationError eq null)}">
 						<font color="red" style="text-transform:uppercase"> 
-						   <c:out value="${sessionScope.AuthenticationError}" />&nbsp;&nbsp;						   
+							<c:if
+								test="${sessionScope.AuthenticationError eq 'wrong login or password'}">
+								<c:out value="${authentication_error}" />
+							</c:if>
+						   <!--<c:out value="${sessionScope.AuthenticationError}" />&nbsp;&nbsp;-->						   
 						</font> 
 					</c:if>
 					<c:set var="AuthenticationError" value="" scope="session" />					
