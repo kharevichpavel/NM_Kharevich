@@ -40,7 +40,7 @@ public class GoToNewsList implements Command {
 		int paginationSizeFromUser;
 		
 		if(request.getParameter(NewsParameter.PAGINATION_SIZE_FROM_USER) == null) {
-			paginationSizeFromUser = 5;
+			paginationSizeFromUser = NewsParameter.PAGINATION_SIZE;
 		}else {			
 			paginationSizeFromUser = Integer.parseInt(request.getParameter(NewsParameter.PAGINATION_SIZE_FROM_USER));
 		}		
