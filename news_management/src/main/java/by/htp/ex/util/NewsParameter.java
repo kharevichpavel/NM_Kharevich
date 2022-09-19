@@ -10,7 +10,10 @@ public class NewsParameter {
 	public static final String BRIEF_NEWS = "brief";
 	public static final String CONTENT_NEWS = "content";	
 	
-	public static final int PAGINATION_SIZE = 5;
+	public static final int PAGINATION_SIZE_FIXED = 5;
 	public static final String PAGINATION_SIZE_FROM_USER = "paginationSizeFromUser";
+	public static final String PAGINATION_SIZE_FOR_PAGE = "paginationSizeForPage";
+	
+	public static final String PAGE_ID = "pageId";
 
 }

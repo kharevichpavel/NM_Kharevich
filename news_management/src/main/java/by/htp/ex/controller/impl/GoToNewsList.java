@@ -31,31 +31,36 @@ public class GoToNewsList implements Command {
 	public void execute(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
 		HttpSession getSession = request.getSession();
-		
-		
-
 		List<News> newsList;
+		
 		int paginationId;
-		int numberOfTableRows;
+		int numberOfTableRows;		
 		int paginationSizeFromUser;
 		
-		if(request.getParameter(NewsParameter.PAGINATION_SIZE_FROM_USER) == null) {
-			paginationSizeFromUser = NewsParameter.PAGINATION_SIZE;
-		}else {			
-			paginationSizeFromUser = Integer.parseInt(request.getParameter(NewsParameter.PAGINATION_SIZE_FROM_USER));
-		}		
-
-		try {			
-			if(request.getParameter("pageId") == null || !request.getParameter("pageId").matches("[0-9]+")) {
+		String resultPaginationFromRequest = request.getParameter(NewsParameter.PAGINATION_SIZE_FROM_USER);	
+		String resultPageIdFromRequest = request.getParameter(NewsParameter.PAGE_ID);
+				
+		try {	
+			
+			if(resultPaginationFromRequest == null || !resultPaginationFromRequest.matches("[0-9]+")) {
+				paginationSizeFromUser = NewsParameter.PAGINATION_SIZE_FIXED;
+			}else {			
+				paginationSizeFromUser = Integer.parseInt(resultPaginationFromRequest);
+			}	
+			if(resultPageIdFromRequest == null || !resultPageIdFromRequest.matches("[0-9]+")) {
 				paginationId = 1;
 			}else {
-				paginationId = Integer.parseInt(request.getParameter("pageId"));				
+				paginationId = Integer.parseInt(resultPageIdFromRequest);				
 			}
+			
 			newsList = newsService.list(paginationId, paginationSizeFromUser);
-			numberOfTableRows = newsService.getDbSize();
-			int paginationSize = (int) Math.ceil((double)numberOfTableRows/paginationSizeFromUser);	
-			request.setAttribute(AttributeForAll.NEWS, newsList);			
-			request.setAttribute(NewsParameter.PAGINATION_SIZE_FROM_USER, paginationSize);		
+			numberOfTableRows = newsService.getDbSize();			
+			
+			int paginationSizeForPage = (int) Math.ceil((double)numberOfTableRows/paginationSizeFromUser);	
+			
+			request.setAttribute(AttributeForAll.NEWS, newsList);
+			request.setAttribute(NewsParameter.PAGINATION_SIZE_FROM_USER, paginationSizeFromUser);
+			request.setAttribute(NewsParameter.PAGINATION_SIZE_FOR_PAGE, paginationSizeForPage);			
 			request.setAttribute(AttributeForAll.PRESENTATION, AttributeForAll.PRESENTATION_NEWS_LIST);
 			request.getRequestDispatcher(AttributeForAll.URL_TO_BASE_LAYOUT).forward(request, response);
 			

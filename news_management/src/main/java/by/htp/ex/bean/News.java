@@ -13,7 +13,7 @@ public class News implements Serializable {
 	private String brief = "";
 	private String content = "";
 	private int userId = 0;	
-
+	
 	public News() {
 	}
 
@@ -36,8 +36,8 @@ public class News implements Serializable {
 		this.title = title;
 		this.brief = brief;
 		this.content = content;
-	}
-
+	}	
+	
 	public Integer getIdNews() {
 		return idNews;
 	}
