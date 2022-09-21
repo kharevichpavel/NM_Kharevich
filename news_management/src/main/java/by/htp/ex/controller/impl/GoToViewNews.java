@@ -9,7 +9,6 @@ import org.apache.logging.log4j.Logger;
 
 import by.htp.ex.bean.News;
 import by.htp.ex.controller.Command;
-import by.htp.ex.dao.connectionpool.ConnectionPoolException;
 import by.htp.ex.service.INewsService;
 import by.htp.ex.service.ServiceException;
 import by.htp.ex.service.ServiceProvider;
@@ -51,7 +50,7 @@ public class GoToViewNews implements Command {
 				response.sendRedirect(AttributeCommand.COMMAND_GO_TO_ERROR_PAGE);
 			}
 			
-		} catch (ServiceException | ConnectionPoolException e) {
+		} catch (ServiceException e) {
 			log.log(Level.ERROR, e);				
 			getSession.setAttribute(ErrorParameter.ERROR_NUMBER, ErrorParameter.ERROR_NUMBER_4);
 			response.sendRedirect(AttributeCommand.COMMAND_GO_TO_ERROR_PAGE);
